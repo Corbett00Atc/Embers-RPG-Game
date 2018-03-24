@@ -85,7 +85,7 @@ namespace RPG.CameraAndUi
 		void ClampValues()
 		{
 			// Clamp vertical:
-			vertical = Mathf.Clamp(vertical, -45, 40);
+			vertical = Mathf.Clamp(vertical, -45, 20);
 		
 			// Wrap horizontal:
 			while (horizontal < 0f) 

@@ -12,12 +12,29 @@ namespace RPG.CameraAndUi
 		[SerializeField] TargetHealthBar healthBar;
 
 		RawImage[] healthBarImages;
-		
+		PlayerTargeting targeting;
+		Enemy enemyTarget;
+
 
 		void Start()
 		{
 			healthBarImages = GetComponentsInChildren<RawImage>();
 			DisableTargetUI();
+			targeting = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<PlayerTargeting>();
+		}
+		
+		void Update()
+		{
+			enemyTarget = targeting.GetCurrentTarget();
+
+			if (enemyTarget)
+			{
+				SetUIEnemyTarget(enemyTarget);
+			}
+			else 
+			{
+				ClearTarget();
+			}
 		}
 
 		public void SetUIEnemyTarget(Enemy enemy)

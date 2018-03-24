@@ -8,9 +8,10 @@ namespace RPG.Characters
 	public class PlayerCombatController : MonoBehaviour 
 	{
 		Player player;
-		GameObject targetedEnemy = null;
+		Enemy targetedEnemy = null;
 		Animator animator;
 		Weapon playerEquippedWeapon;
+		PlayerTargeting targeting;
 		
 		float timeOfLastAction;
 		float lockedTill = 0;
@@ -22,20 +23,22 @@ namespace RPG.Characters
 		{
 			player = GetComponent<Player>();
 			animator = GetComponent<Animator>();
+			targeting = GetComponentInChildren<PlayerTargeting>();
+
 			SetWeaponData();
 		}
 
 		void Update()
-		{		
-			if (player.HasCurrentEnemyTarget())
-			{
-				targetedEnemy = player.CurrentTarget();
+		{	
+			GetTargetedEnemy();
+
+			if (Input.GetMouseButtonDown(0))
 				StandardMeleeAttack();
-			}
-			else
-			{
-				targetedEnemy = null;
-			}
+		}
+
+		void GetTargetedEnemy()
+		{
+			targetedEnemy = targeting.GetCurrentTarget();
 		}
 
 		void SetWeaponData()
@@ -69,17 +72,19 @@ namespace RPG.Characters
 		*/
 		void StandardMeleeAttack()
 		{
-			if (Input.GetKeyDown("1") && Time.time > lockedTill && IsInRange(attackRange))
+			if (Time.time > lockedTill && targetedEnemy != null)
 			{
-				animator.SetBool("Attack", true);
-				SendDamageToTarget(attackDamage);
-				TimeTillNextAction(attackSpeed);
+				if (IsInRange(attackRange))
+				{
+					animator.SetBool("Attack", true);
+					SendDamageToTarget(attackDamage);
+					TimeTillNextAction(attackSpeed);
+				}
+				else
+				{
+					print("Not in range for StandardMeleeAttack()");
+				}
 			}
-		}
-
-		void TargetCloseFrontEnemy()
-		{
-			
 		}
 	}
 }

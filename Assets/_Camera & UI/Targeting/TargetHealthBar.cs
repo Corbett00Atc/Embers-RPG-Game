@@ -21,7 +21,7 @@ namespace RPG.CameraAndUi
 		// Update is called once per frame
 		void Update()
 		{
-			if (enemyTarget != null)
+			if (enemyTarget)
 			{
 				float xValue = (enemyTarget.healthAsPercentage / 2f) - 0.5f;
 				healthBarRawImage.uvRect = new Rect(-xValue, 0f, 0.5f, 1f);

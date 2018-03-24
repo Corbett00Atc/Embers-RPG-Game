@@ -44,11 +44,17 @@ namespace RPG.Characters
 		AICharacterControl aICharacterControl = null;
 		GameObject player = null;
 
+		TargetMarker targetMark;
+		Renderer rend;
+
+
 		void Start()
 		{
 			player = GameObject.FindGameObjectWithTag("Player");
 			aICharacterControl = GetComponent<AICharacterControl>();
 			currentHealthPoints = maxHealthPoints;
+			targetMark = GetComponentInChildren<TargetMarker>();
+			rend = targetMark.GetComponentInChildren<Renderer>();
 		}
 
 		void Update()
@@ -78,7 +84,7 @@ namespace RPG.Characters
 
 			if (currentHealthPoints == 0)
 			{
-				player.GetComponent<Player>().TargetDied();
+				player.GetComponentInChildren<PlayerTargeting>().TargetDied(this);
 				Destroy(this.gameObject);
 			}
 		}
@@ -171,6 +177,17 @@ namespace RPG.Characters
 			// draw spell range 
 			Gizmos.color = new Color(0f, 125f, 125f, .75f);
 			Gizmos.DrawWireSphere(transform.position, spellCastRadius);
+		}
+
+		public void MarkTarget()
+		{
+			rend.enabled = true;
+	
+		}
+
+		public void UnMarkTarget()
+		{
+			rend.enabled = false;
 		}
 	}
 }
