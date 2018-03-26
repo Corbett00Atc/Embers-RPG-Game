@@ -14,26 +14,44 @@ namespace RPG.Characters
 		[SerializeField] float maxHealthPoints = 100f;
 		[SerializeField] Weapon weaponInUse; 
 		[SerializeField] AnimatorOverrideController animatorOverrideController;
+		[SerializeField] GameObject hitEffect;
 
 		float currentHealthPoints;
+		PlayerCombatController combatController;
+		HitPoint hitPoint;
 
 		public float healthAsPercentage 
 		{ get { return currentHealthPoints / maxHealthPoints; }	}
-
-		public Weapon GetWeaponInUse()
-		{ return weaponInUse;}
-
-		public void TakeDamage(float damage)
-		{ currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints); }
-
-		void SetHealthPoints()
-		{ currentHealthPoints = maxHealthPoints; }
-
+		
 		void Start()
 		{
 			PutWeaponInHand();
 			SetRuntimeAnimatorController();
 			SetHealthPoints();
+			combatController = GetComponentInChildren<PlayerCombatController>();
+			hitPoint = GetComponentInChildren<HitPoint>();
+		}
+
+		public void TakeDamage(float damage)
+		{ 
+			if (combatController.GetDodge())
+				return; // player immunte while dodging
+			else
+			{
+				currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints); 
+				CreateHitEffect();
+			}
+		}
+
+		public Weapon GetWeaponInUse()
+		{ return weaponInUse;}
+
+		void SetHealthPoints()
+		{ currentHealthPoints = maxHealthPoints; }
+
+		void CreateHitEffect()
+		{
+			Instantiate(hitEffect, hitPoint.transform);
 		}
 
 		void SetRuntimeAnimatorController()

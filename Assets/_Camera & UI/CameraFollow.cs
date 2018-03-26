@@ -20,7 +20,6 @@ namespace RPG.CameraAndUi
 		private Vector3 freeViewLook = new Vector3(0, 0, 0);
 		private Vector3 cameraStartPosition;
 		private Vector3 cameraAdjustedPosition;
-		private Quaternion cameraStartRotation;
 		private PlayerCameraFocusPointLocation cameraFocusPoint;
 		private GameObject player;	
 		private Camera gameCamera;
@@ -37,7 +36,6 @@ namespace RPG.CameraAndUi
 			cameraStartPosition = gameCamera.transform.localPosition;
 			gameCamera.transform.localPosition = cameraStartPosition;
 			cameraAdjustedPosition = cameraStartPosition;
-			cameraStartRotation = gameCamera.transform.localRotation;
 
 			// sets focus object location 
 			cameraFocusPoint = GetComponentInChildren<PlayerCameraFocusPointLocation>();

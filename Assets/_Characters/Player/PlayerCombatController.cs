@@ -7,6 +7,8 @@ namespace RPG.Characters
 {
 	public class PlayerCombatController : MonoBehaviour 
 	{
+		[SerializeField] float dodgeImmuneTime = .5f;
+
 		Player player;
 		Enemy targetedEnemy = null;
 		Animator animator;
@@ -18,6 +20,8 @@ namespace RPG.Characters
 		float attackDamage;
 		float attackRange;
 		float attackSpeed;
+
+		bool dodging = false;
 
 		void Start()
 		{
@@ -31,15 +35,18 @@ namespace RPG.Characters
 		void Update()
 		{	
 			GetTargetedEnemy();
-
+			if (Input.GetButtonDown("Dodge"))
+				DodgeRoll();
 			if (Input.GetMouseButtonDown(0))
 				StandardMeleeAttack();
 		}
 
 		void GetTargetedEnemy()
-		{
-			targetedEnemy = targeting.GetCurrentTarget();
-		}
+		{ targetedEnemy = targeting.GetCurrentTarget();	}
+
+		public bool GetDodge()
+		{ return dodging; }
+		
 
 		void SetWeaponData()
 		{
@@ -85,6 +92,23 @@ namespace RPG.Characters
 					print("Not in range for StandardMeleeAttack()");
 				}
 			}
+		}
+
+		void DodgeRoll()
+		{
+			if (!dodging)
+				StartCoroutine(Immune());
+		}
+
+
+		IEnumerator Immune()
+		{
+			dodging = true;
+			print("immune");
+			animator.SetBool("Dodging", true);
+			yield return new WaitForSeconds(dodgeImmuneTime);
+			dodging = false;
+			print("not immune");
 		}
 	}
 }
