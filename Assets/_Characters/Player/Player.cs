@@ -14,87 +14,44 @@ namespace RPG.Characters
 		[SerializeField] float maxHealthPoints = 100f;
 		[SerializeField] Weapon weaponInUse; 
 		[SerializeField] AnimatorOverrideController animatorOverrideController;
+		[SerializeField] GameObject hitEffect;
 
-		GameObject  currentTarget;
-		CameraRaycaster cursorTarget;
-		bool hasCurrentEnemyTarget = false;
 		float currentHealthPoints;
+		PlayerCombatController combatController;
+		HitPoint hitPoint;
 
 		public float healthAsPercentage 
 		{ get { return currentHealthPoints / maxHealthPoints; }	}
+		
+		void Start()
+		{
+			PutWeaponInHand();
+			SetRuntimeAnimatorController();
+			SetHealthPoints();
+			combatController = GetComponentInChildren<PlayerCombatController>();
+			hitPoint = GetComponentInChildren<HitPoint>();
+		}
 
-		public GameObject CurrentTarget()
-		{ return currentTarget; }
-
-		public bool HasCurrentEnemyTarget()
-		{return hasCurrentEnemyTarget; }
+		public void TakeDamage(float damage)
+		{ 
+			if (combatController.GetDodge())
+				return; // player immunte while dodging
+			else
+			{
+				currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints); 
+				CreateHitEffect();
+			}
+		}
 
 		public Weapon GetWeaponInUse()
 		{ return weaponInUse;}
 
-		public void TakeDamage(float damage)
-		{ currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints); }
-
-		public void TargetDied()
-		{ Targetless(); }
-
 		void SetHealthPoints()
 		{ currentHealthPoints = maxHealthPoints; }
 
-		void Start()
+		void CreateHitEffect()
 		{
-			RegisterForMouseClick();
-			PutWeaponInHand();
-			SetRuntimeAnimatorController();
-			SetHealthPoints();
-		}
-
-		void RegisterForMouseClick()
-		{
-			cursorTarget = FindObjectOfType<CameraRaycaster>();
-			cursorTarget.notifyMouseClickObservers += OnMouseClick;
-		}
-
-		void OnMouseClick(RaycastHit raycastHit, int layer)
-		{
-			// took off because of not using mouse clicks?
-			/* switch (layer)
-			{
-				case enemyLayerNumber: // enemy
-					TargetEnemy(raycastHit);
-					break;
-				default: // clear target
-					Targetless();
-					break;
-			} */
-		}
-
-		public void TargetThisEnemy(Enemy enemyTarget)
-		{
-			if (enemyTarget != null)
-			{
-				hasCurrentEnemyTarget = true;
-				targetUI.SetUIEnemyTarget(enemyTarget);
-			}
-		}
-
-		void TargetEnemy(RaycastHit raycastHit)
-		{
-			currentTarget = raycastHit.collider.gameObject;
-			Enemy enemyTarget = currentTarget.GetComponent<Enemy>();
-
-			if (enemyTarget != null)
-			{
-				hasCurrentEnemyTarget = true;
-				targetUI.SetUIEnemyTarget(enemyTarget);
-			}
-		}
-		
-		void Targetless()
-		{
-			currentTarget = null;
-			hasCurrentEnemyTarget = false;
-			targetUI.ClearTarget();
+			Instantiate(hitEffect, hitPoint.transform);
 		}
 
 		void SetRuntimeAnimatorController()

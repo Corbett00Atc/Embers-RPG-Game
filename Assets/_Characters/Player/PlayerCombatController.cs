@@ -7,10 +7,13 @@ namespace RPG.Characters
 {
 	public class PlayerCombatController : MonoBehaviour 
 	{
+		[SerializeField] float dodgeImmuneTime = .5f;
+
 		Player player;
-		GameObject targetedEnemy = null;
+		Enemy targetedEnemy = null;
 		Animator animator;
 		Weapon playerEquippedWeapon;
+		PlayerTargeting targeting;
 		
 		float timeOfLastAction;
 		float lockedTill = 0;
@@ -18,25 +21,32 @@ namespace RPG.Characters
 		float attackRange;
 		float attackSpeed;
 
+		bool dodging = false;
+
 		void Start()
 		{
 			player = GetComponent<Player>();
 			animator = GetComponent<Animator>();
+			targeting = GetComponentInChildren<PlayerTargeting>();
+
 			SetWeaponData();
 		}
 
 		void Update()
-		{		
-			if (player.HasCurrentEnemyTarget())
-			{
-				targetedEnemy = player.CurrentTarget();
+		{	
+			GetTargetedEnemy();
+			if (Input.GetButtonDown("Dodge"))
+				DodgeRoll();
+			if (Input.GetMouseButtonDown(0))
 				StandardMeleeAttack();
-			}
-			else
-			{
-				targetedEnemy = null;
-			}
 		}
+
+		void GetTargetedEnemy()
+		{ targetedEnemy = targeting.GetCurrentTarget();	}
+
+		public bool GetDodge()
+		{ return dodging; }
+		
 
 		void SetWeaponData()
 		{
@@ -69,17 +79,36 @@ namespace RPG.Characters
 		*/
 		void StandardMeleeAttack()
 		{
-			if (Input.GetKeyDown("1") && Time.time > lockedTill && IsInRange(attackRange))
+			if (Time.time > lockedTill && targetedEnemy != null)
 			{
-				animator.SetBool("Attack", true);
-				SendDamageToTarget(attackDamage);
-				TimeTillNextAction(attackSpeed);
+				if (IsInRange(attackRange))
+				{
+					animator.SetBool("Attack", true);
+					SendDamageToTarget(attackDamage);
+					TimeTillNextAction(attackSpeed);
+				}
+				else
+				{
+					print("Not in range for StandardMeleeAttack()");
+				}
 			}
 		}
 
-		void TargetCloseFrontEnemy()
+		void DodgeRoll()
 		{
-			
+			if (!dodging)
+				StartCoroutine(Immune());
+		}
+
+
+		IEnumerator Immune()
+		{
+			dodging = true;
+			print("immune");
+			animator.SetBool("Dodging", true);
+			yield return new WaitForSeconds(dodgeImmuneTime);
+			dodging = false;
+			print("not immune");
 		}
 	}
 }

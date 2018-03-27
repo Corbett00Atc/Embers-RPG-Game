@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using RPG.Characters;
 
 namespace RPG.Combat
 {
@@ -17,10 +18,17 @@ namespace RPG.Combat
 		public void SetShooter(GameObject shooter) { this.shooter = shooter; }
 		public float ProjectileSpeed() { return projectileSpeed; }
 
+		// TODO: make projectiles pass through if player is dodging
 		void OnCollisionEnter(Collision collision)
 		{
 			if (collision == null)
 				return;
+
+			/* if (collision.gameObject.gameObject.GetComponentInChildren<PlayerCombatController>().GetDodge())
+			{
+				Physics.IgnoreCollision(this.GetComponent<Collider>(), collision.collider);
+				return;
+			} */
 
 			var layerCollidedWith = collision.gameObject.layer;
 			if (shooter != null && layerCollidedWith != shooter.layer)
