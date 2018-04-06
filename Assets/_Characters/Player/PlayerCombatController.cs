@@ -104,11 +104,9 @@ namespace RPG.Characters
 		IEnumerator Immune()
 		{
 			dodging = true;
-			print("immune");
 			animator.SetBool("Dodging", true);
 			yield return new WaitForSeconds(dodgeImmuneTime);
 			dodging = false;
-			print("not immune");
 		}
 	}
 }
