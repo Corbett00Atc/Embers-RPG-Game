@@ -9,7 +9,6 @@ namespace RPG.Characters
     public class PlayerMovement : MonoBehaviour
     {    
         ThirdPersonCharacter thirdPersonCharacter = null;   // A reference to the ThirdPersonCharacter on the object
-        CameraRaycaster cameraRaycaster = null;
         private Vector3 m_Move;
 
 
@@ -17,9 +16,7 @@ namespace RPG.Characters
         private void Start()
         {
             thirdPersonCharacter = GetComponent<ThirdPersonCharacter>();
-            cameraRaycaster = Camera.main.GetComponent<CameraRaycaster>();
 
-            cameraRaycaster.notifyMouseClickObservers += ProcessClick;
         }
 
         void Update()

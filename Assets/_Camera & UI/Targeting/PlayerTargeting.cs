@@ -24,7 +24,7 @@ namespace RPG.Characters
 
 		void OnTriggerEnter(Collider other)
 		{	
-			if (other.gameObject.tag == "Enemy")
+			if (other.gameObject.GetComponent<Enemy>() != null)
 				targetsInRange.Add(other.gameObject.GetComponent<Enemy>());
 			
 			return;
@@ -32,13 +32,16 @@ namespace RPG.Characters
 
 		void OnTriggerExit(Collider other)
 		{
-			if (other.gameObject.tag == "Enemy")
+			if (other.gameObject.GetComponent<Enemy>() != null)
 			{
 				Enemy e = other.gameObject.GetComponent<Enemy>();
 				targetsInRange.Remove(e);	
 
 				if (e == currentTarget)
+				{
+					UnMarkTarget();
 					currentTarget = null;
+				}
 			}
 			
 			return;

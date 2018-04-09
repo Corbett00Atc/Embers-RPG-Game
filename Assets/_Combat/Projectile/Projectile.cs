@@ -24,12 +24,6 @@ namespace RPG.Combat
 			if (collision == null)
 				return;
 
-			/* if (collision.gameObject.gameObject.GetComponentInChildren<PlayerCombatController>().GetDodge())
-			{
-				Physics.IgnoreCollision(this.GetComponent<Collider>(), collision.collider);
-				return;
-			} */
-
 			var layerCollidedWith = collision.gameObject.layer;
 			if (shooter != null && layerCollidedWith != shooter.layer)
 				DamageOnIdamageable(collision);
