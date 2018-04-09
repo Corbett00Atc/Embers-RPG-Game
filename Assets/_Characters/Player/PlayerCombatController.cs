@@ -14,6 +14,7 @@ namespace RPG.Characters
 		Animator animator;
 		Weapon playerEquippedWeapon;
 		PlayerTargeting targeting;
+		Energy energy;
 		
 		float timeOfLastAction;
 		float lockedTill = 0;
@@ -28,6 +29,7 @@ namespace RPG.Characters
 			player = GetComponent<Player>();
 			animator = GetComponent<Animator>();
 			targeting = GetComponentInChildren<PlayerTargeting>();
+			energy = GetComponent<Energy>();
 
 			SetWeaponData();
 		}
@@ -79,6 +81,9 @@ namespace RPG.Characters
 		*/
 		void StandardMeleeAttack()
 		{
+			if (energy.HasEnergyToAttack() == false)
+				return;
+
 			if (Time.time > lockedTill && targetedEnemy != null)
 			{
 				if (IsInRange(attackRange))
@@ -86,6 +91,7 @@ namespace RPG.Characters
 					animator.SetBool("Attack", true);
 					SendDamageToTarget(attackDamage);
 					TimeTillNextAction(attackSpeed);
+					energy.UpdateCurrentEnergy();
 				}
 				else
 				{
