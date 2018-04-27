@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityStandardAssets.Characters.ThirdPerson;
 using RPG.CameraAndUi;
 
 namespace RPG.Characters

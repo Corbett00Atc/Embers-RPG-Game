@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using RPG.Characters;
 
-namespace RPG.Characters
+namespace RPG.Combat
 {	
 	[CreateAssetMenu(menuName=("RPG/Special Ability/Power Attack"))]
 	public class PowerAttackConfig : SpecialAbility 

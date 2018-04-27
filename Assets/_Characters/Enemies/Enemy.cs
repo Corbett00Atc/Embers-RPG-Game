@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityStandardAssets.Characters.ThirdPerson;
 using RPG.Combat;
 
 namespace RPG.Characters
@@ -11,6 +10,8 @@ namespace RPG.Characters
 		[SerializeField] bool hasMeleeAttack = false;
 		[SerializeField] bool hasRangedAttack = false;
 		[SerializeField] bool hasSpellAttack = false;
+
+		[SerializeField] float immuneAfterHitDelay = .1f;
 
 		[SerializeField] float maxHealthPoints = 100f;
 		[SerializeField] float aggroRange = 6f;
@@ -40,12 +41,17 @@ namespace RPG.Characters
 		float rangedAttackLockedTill = 0;
 		float distanceToPlayer;
 		float currentTime;
+		float timeSinceLastHit;
+
+		public bool immuneToDamage = true;
 
 		AICharacterControl aICharacterControl = null;
 		GameObject player = null;
 
 		TargetMarker targetMark;
 		Renderer rend;
+		Animator anim;
+		WeaponHook weaponDamageCollider;
 
 
 		void Start()
@@ -55,12 +61,17 @@ namespace RPG.Characters
 			currentHealthPoints = maxHealthPoints;
 			targetMark = GetComponentInChildren<TargetMarker>();
 			rend = targetMark.GetComponentInChildren<Renderer>();
+			weaponDamageCollider = GetComponentInChildren<WeaponHook>();
+			timeSinceLastHit = immuneAfterHitDelay;
+			anim = GetComponent<Animator>();
 		}
 
 		void Update()
 		{
 			distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
 			currentTime = Time.time;
+
+			UpdateImmunityGracePeriod();
 
 			if (distanceToPlayer <= aggroRange)
 			{
@@ -78,8 +89,27 @@ namespace RPG.Characters
 			get { return currentHealthPoints / maxHealthPoints; }
 		}
 
+		private void UpdateImmunityGracePeriod()
+		{
+			if (timeSinceLastHit >= immuneAfterHitDelay)
+			{
+				immuneToDamage = false;
+				return;
+			}
+
+			timeSinceLastHit += Time.deltaTime;
+		}
+
 		public void TakeDamage(float damage)
 		{
+			if (immuneToDamage)
+				return;
+			else 
+			{	
+				timeSinceLastHit = 0;
+				immuneToDamage = true;
+			}
+
 			currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints);
 
 			if (currentHealthPoints == 0)
@@ -91,6 +121,9 @@ namespace RPG.Characters
 		// basic ai decision making based on range
 		void MakeMoveAttackDecision()
 		{
+			if (anim.GetBool("actionLocked") == true)
+				return;
+
 			// First priority: cast spells
 			if (hasSpellAttack && distanceToPlayer <= spellCastRadius 
 					&& currentTime >= spellLockedTill && currentTime >= lockedTill)
@@ -141,7 +174,8 @@ namespace RPG.Characters
 
 		void PerformMeleeAttack()
 		{
-			player.GetComponent<IDamageable>().TakeDamage(meleeAttackDamage);
+			anim.CrossFade("Primary Attack", 0.2f);
+			//player.GetComponent<IDamageable>().TakeDamage(meleeAttackDamage);
 		}
 
 		// will customize further in future
@@ -187,6 +221,21 @@ namespace RPG.Characters
 		public void UnMarkTarget()
 		{
 			rend.enabled = false;
+		}
+
+		public void OpenDamageColliders()
+        {
+            weaponDamageCollider.OpenDamageColliders();
+        }
+
+        public void CloseDamageColliders()
+        {
+            weaponDamageCollider.CloseDamageColliders();
+        }
+
+		public float GetMeleeDamage()
+		{
+			return meleeAttackDamage;
 		}
 	}
 }

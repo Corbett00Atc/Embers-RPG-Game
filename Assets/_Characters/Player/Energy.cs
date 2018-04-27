@@ -9,20 +9,28 @@ namespace RPG.Characters
 	{
 		[SerializeField] RawImage energyBar;
 		[SerializeField] float maxEnergyPoints = 100f;
-		[SerializeField] float energyRegenDelay = 3f;
-
+		[SerializeField] float energyPointsPerSecond = 10f;
 
 		float currentEnergyPoints;
 
 		void Start()
 		{
 			currentEnergyPoints = maxEnergyPoints;
-			StartCoroutine(EnergyRegen());
 		}
 
 		void Update()
 		{
-			SetEnergyBar();
+			if (currentEnergyPoints < maxEnergyPoints)
+			{
+				AddEnergyPoints();
+				SetEnergyBar();
+			}
+		}
+
+		void AddEnergyPoints()
+		{
+			var pointsToAdd = energyPointsPerSecond * Time.deltaTime;
+			currentEnergyPoints = Mathf.Clamp(currentEnergyPoints + pointsToAdd, 0, maxEnergyPoints);
 		}
 
 		void SetEnergyBar()
@@ -33,25 +41,6 @@ namespace RPG.Characters
 				0.5f, 
 				1f
 				);
-		}
-
-		IEnumerator EnergyRegen()
-		{
-			while (true)
-			{	
-				// ticks 1% of energy at user defines speed
-				float energyTick = maxEnergyPoints / 100;
-				
-				if (currentEnergyPoints < maxEnergyPoints)
-				{
-					currentEnergyPoints += energyTick;
-
-					if (currentEnergyPoints > maxEnergyPoints)
-						currentEnergyPoints = maxEnergyPoints;
-				}		
-
-				yield return new WaitForSeconds(energyRegenDelay / 100);
-			}
 		}
 
 		// moves energy bar based on current energy as percent

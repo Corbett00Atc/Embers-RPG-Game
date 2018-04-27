@@ -34,7 +34,6 @@ namespace RPG.Characters
 
 		public void TakeDamage(float damage)
 		{ 
-			
 			currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints); 
 			CreateHitEffect();
 		}

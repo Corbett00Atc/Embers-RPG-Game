@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using RPG.Combat;
+using RPG.Characters;
 
-namespace RPG.Characters
+namespace RPG.Combat
 {
 	public class PowerAttackBehavior : MonoBehaviour, ISpecialAbility
 	{
