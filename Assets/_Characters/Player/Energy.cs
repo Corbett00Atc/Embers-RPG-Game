@@ -9,7 +9,6 @@ namespace RPG.Characters
 	{
 		[SerializeField] RawImage energyBar;
 		[SerializeField] float maxEnergyPoints = 100f;
-		[SerializeField] float costPerMeleeSwing = 25f;
 		[SerializeField] float energyRegenDelay = 3f;
 
 
@@ -21,24 +20,9 @@ namespace RPG.Characters
 			StartCoroutine(EnergyRegen());
 		}
 
-		// moves energy bar based on current energy as percent
-		public void UpdateCurrentEnergy()
-		{
-			currentEnergyPoints = Mathf.Clamp(
-				currentEnergyPoints - costPerMeleeSwing,
-				0, 
-				maxEnergyPoints
-			);
-		}
-
 		void Update()
 		{
 			SetEnergyBar();
-		}
-
-		public bool HasEnergyToAttack()
-		{
-			return (currentEnergyPoints - costPerMeleeSwing >= 0) ? true : false;
 		}
 
 		void SetEnergyBar()
@@ -68,6 +52,21 @@ namespace RPG.Characters
 
 				yield return new WaitForSeconds(energyRegenDelay / 100);
 			}
+		}
+
+		// moves energy bar based on current energy as percent
+		public void ConsumeEnergy(float amount)
+		{
+			currentEnergyPoints = Mathf.Clamp(
+				currentEnergyPoints - amount,
+				0, 
+				maxEnergyPoints
+			);
+		}
+
+		public bool IsEnergyAvailable(float amount)
+		{
+			return amount < currentEnergyPoints;
 		}
 	}
 }

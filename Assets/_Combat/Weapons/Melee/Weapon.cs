@@ -10,9 +10,7 @@ namespace RPG.Combat
         [SerializeField] GameObject weaponPrefab;
         [SerializeField] AnimationClip attackAnimation;
 		[SerializeField] float weaponDamage;
-		[SerializeField] float weaponAttackTime;
-		[SerializeField] float weaponAttackRange;
-
+		[SerializeField] float weaponSwingCost;
 
         public Transform gripTransform;
 
@@ -22,11 +20,8 @@ namespace RPG.Combat
         public float GetWeaponDamage()
         { return weaponDamage; }
 
-        public float GetWeaponAttackTime()
-        { return weaponAttackTime; } 
-
-        public float GetWeaponAttackRange()
-        { return weaponAttackRange; } 
+        public float GetWeaponEnergyCost()
+        { return weaponSwingCost; } 
 
         // prevents asset pack crashes
         private void MakeAnimationEventless()
@@ -34,7 +29,7 @@ namespace RPG.Combat
 
         public AnimationClip GetAttackAnimClip()
         {
-            MakeAnimationEventless();
+            //MakeAnimationEventless();
             return attackAnimation;
         }
     }

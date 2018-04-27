@@ -17,8 +17,8 @@ namespace RPG.Characters
 		[SerializeField] GameObject hitEffect;
 
 		float currentHealthPoints;
-		PlayerCombatController combatController;
 		HitPoint hitPoint;
+		WeaponHook weaponDamageCollider;
 
 		public float healthAsPercentage 
 		{ get { return currentHealthPoints / maxHealthPoints; }	}
@@ -28,19 +28,15 @@ namespace RPG.Characters
 			PutWeaponInHand();
 			SetRuntimeAnimatorController();
 			SetHealthPoints();
-			combatController = GetComponentInChildren<PlayerCombatController>();
 			hitPoint = GetComponentInChildren<HitPoint>();
-		}
+			weaponDamageCollider = GetComponentInChildren<WeaponHook>();
+		} 
 
 		public void TakeDamage(float damage)
 		{ 
-			if (combatController.GetDodge())
-				return; // player immunte while dodging
-			else
-			{
-				currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints); 
-				CreateHitEffect();
-			}
+			
+			currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints); 
+			CreateHitEffect();
 		}
 
 		public Weapon GetWeaponInUse()
@@ -82,5 +78,15 @@ namespace RPG.Characters
 			
 			return dominantHands[0].gameObject;
 		}
+
+		public void OpenDamageColliders()
+        {
+            weaponDamageCollider.OpenDamageColliders();
+        }
+
+        public void CloseDamageColliders()
+        {
+            weaponDamageCollider.CloseDamageColliders();
+        }
 	}
 }

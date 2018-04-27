@@ -13,6 +13,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		[SerializeField] float m_MoveSpeedMultiplier = 1f;
 		[SerializeField] float m_AnimSpeedMultiplier = 1f;
 		[SerializeField] float m_GroundCheckDistance = 0.1f;
+		[SerializeField] float notSprintingSpeedCap = 0.8f;
 
 		Rigidbody m_Rigidbody;
 		Animator m_Animator;
@@ -33,7 +34,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		}
 
 
-		public void Move(Vector3 move)
+		public void Move(Vector3 move, bool sprint)
 		{
 
 			// convert the world relative moveInput vector into a local-relative
@@ -46,10 +47,18 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			m_TurnAmount = Mathf.Atan2(move.x, move.z);
 			m_ForwardAmount = move.z;
 
+			HandleSprint(sprint);
+
 			ApplyExtraTurnRotation();
 
 			// send input and other state parameters to the animator
 			UpdateAnimator(move);
+		}
+
+		void HandleSprint(bool sprint)
+		{
+			if (sprint == false)
+				m_ForwardAmount = Mathf.Clamp(m_ForwardAmount, 0, notSprintingSpeedCap);
 		}
 
 		void UpdateAnimator(Vector3 move)

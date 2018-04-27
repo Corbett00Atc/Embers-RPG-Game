@@ -84,7 +84,6 @@ namespace RPG.Characters
 
 			if (currentHealthPoints == 0)
 			{
-				player.GetComponentInChildren<PlayerTargeting>().TargetDied(this);
 				Destroy(this.gameObject);
 			}
 		}
