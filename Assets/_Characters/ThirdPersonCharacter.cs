@@ -7,21 +7,25 @@ namespace RPG.Characters
 	[RequireComponent(typeof(Animator))]
 	public class ThirdPersonCharacter : MonoBehaviour
 	{
+		const float k_Half = 0.5f;
+
+		[Range(1f, 4f)][SerializeField] float m_GravityMultiplier = 2f;
 		[SerializeField] float m_MovingTurnSpeed = 360;
 		[SerializeField] float m_StationaryTurnSpeed = 180;
-		[Range(1f, 4f)][SerializeField] float m_GravityMultiplier = 2f;
 		[SerializeField] float m_MoveSpeedMultiplier = 1f;
 		[SerializeField] float m_AnimSpeedMultiplier = 1f;
 		[SerializeField] float m_GroundCheckDistance = 0.1f;
-		[SerializeField] float notSprintingSpeedCap = 0.8f;
+		[SerializeField] float sprintMultiplier = 1.2f;
 
+		Vector3 m_GroundNormal;
 		Rigidbody m_Rigidbody;
 		Animator m_Animator;
+
 		float m_OrigGroundCheckDistance;
-		const float k_Half = 0.5f;
 		float m_TurnAmount;
 		float m_ForwardAmount;
-		Vector3 m_GroundNormal;
+		float m_MoveSpeedOriginal;
+		float m_AnimSpeedOriginal;
 
 
 		void Start()
@@ -31,6 +35,9 @@ namespace RPG.Characters
 
 			m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
 			m_OrigGroundCheckDistance = m_GroundCheckDistance;
+
+			m_MoveSpeedOriginal = m_MoveSpeedMultiplier;
+			m_AnimSpeedOriginal = m_AnimSpeedMultiplier;
 		}
 
 
@@ -57,8 +64,16 @@ namespace RPG.Characters
 
 		void HandleSprint(bool sprint)
 		{
-			if (sprint == false)
-				m_ForwardAmount = Mathf.Clamp(m_ForwardAmount, 0, notSprintingSpeedCap);
+			if (sprint)
+			{
+				m_AnimSpeedMultiplier = m_AnimSpeedOriginal * sprintMultiplier;
+				m_MoveSpeedMultiplier = m_MoveSpeedOriginal * sprintMultiplier;
+			}
+			else
+			{
+				m_AnimSpeedMultiplier = m_AnimSpeedOriginal;
+				m_MoveSpeedMultiplier = m_MoveSpeedOriginal;
+			}
 		}
 
 		void UpdateAnimator(Vector3 move)

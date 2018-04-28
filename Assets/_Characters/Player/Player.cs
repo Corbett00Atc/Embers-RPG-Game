@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using RPG.CameraAndUi;
 using RPG.Combat;
+using UnityEngine.SceneManagement;
 
 namespace RPG.Characters
 {
@@ -15,10 +16,12 @@ namespace RPG.Characters
 		[SerializeField] Weapon weaponInUse; 
 		[SerializeField] AnimatorOverrideController animatorOverrideController;
 		[SerializeField] GameObject hitEffect;
+		[SerializeField] float deathResetTime = 2;
 
 		float currentHealthPoints;
 		HitPoint hitPoint;
 		WeaponHook weaponDamageCollider;
+		Animator anim;
 
 		public float healthAsPercentage 
 		{ get { return currentHealthPoints / maxHealthPoints; }	}
@@ -30,12 +33,22 @@ namespace RPG.Characters
 			SetHealthPoints();
 			hitPoint = GetComponentInChildren<HitPoint>();
 			weaponDamageCollider = GetComponentInChildren<WeaponHook>();
+			anim = GetComponent<Animator>();
 		} 
-
+		
 		public void TakeDamage(float damage)
-		{ 
-			currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints); 
+		{
+			ReduceHealth(damage);
+
+			bool playerDies = (currentHealthPoints - damage <= 0);
+			if (playerDies)
+				StartCoroutine(KillPlayer());
+		}
+
+		private void ReduceHealth(float damage)
+		{
 			CreateHitEffect();
+			currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints); 
 		}
 
 		public Weapon GetWeaponInUse()
@@ -76,6 +89,13 @@ namespace RPG.Characters
 			Assert.IsFalse(numberOfDominantHands > 1, "Multiple dominant hand scripts on player");
 			
 			return dominantHands[0].gameObject;
+		}
+
+		IEnumerator KillPlayer()
+		{
+			anim.SetTrigger("PlayerDied");
+			yield return new WaitForSeconds(deathResetTime);
+			SceneManager.LoadScene(0);
 		}
 
 		public void OpenDamageColliders()

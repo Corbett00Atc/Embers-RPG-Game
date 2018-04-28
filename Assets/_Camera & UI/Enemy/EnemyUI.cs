@@ -13,12 +13,12 @@ namespace RPG.Characters
         GameObject enemyCanvasPrefab = null;
 
         Camera cameraToLookAt;
+        bool exists = false;
 
         // Use this for initialization 
         void Start()
         {
             cameraToLookAt = Camera.main;
-            Instantiate(enemyCanvasPrefab, transform.position, transform.rotation, transform);
         }
 
         // Update is called once per frame 
@@ -26,6 +26,21 @@ namespace RPG.Characters
         {
             transform.LookAt(cameraToLookAt.transform);
             transform.rotation = Quaternion.LookRotation(cameraToLookAt.transform.forward);
+        }
+
+        public void DisplayHealthbar(bool display)
+        {
+            if (display && !exists)
+            {
+                Instantiate(enemyCanvasPrefab, transform.position, transform.rotation, transform);
+                exists = true;
+            }
+            else if (!display && exists)
+            {
+                DestroyImmediate(enemyCanvasPrefab);
+                exists = false;
+            }
+
         }
     }
 }

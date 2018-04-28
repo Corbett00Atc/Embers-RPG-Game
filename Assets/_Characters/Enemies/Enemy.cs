@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using RPG.Combat;
+using UnityEngine.AI;
 
 namespace RPG.Characters
 {
@@ -43,6 +44,8 @@ namespace RPG.Characters
 		float currentTime;
 		float timeSinceLastHit;
 
+		bool isFacing = false;
+
 		public bool immuneToDamage = true;
 
 		AICharacterControl aICharacterControl = null;
@@ -52,18 +55,20 @@ namespace RPG.Characters
 		Renderer rend;
 		Animator anim;
 		WeaponHook weaponDamageCollider;
-
+		EnemyUI enemyUI;
 
 		void Start()
 		{
 			player = GameObject.FindGameObjectWithTag("Player");
 			aICharacterControl = GetComponent<AICharacterControl>();
-			currentHealthPoints = maxHealthPoints;
 			targetMark = GetComponentInChildren<TargetMarker>();
 			rend = targetMark.GetComponentInChildren<Renderer>();
 			weaponDamageCollider = GetComponentInChildren<WeaponHook>();
-			timeSinceLastHit = immuneAfterHitDelay;
 			anim = GetComponent<Animator>();
+			enemyUI = GetComponentInChildren<EnemyUI>();
+
+			currentHealthPoints = maxHealthPoints;
+			timeSinceLastHit = immuneAfterHitDelay;		
 		}
 
 		void Update()
@@ -102,6 +107,8 @@ namespace RPG.Characters
 
 		public void TakeDamage(float damage)
 		{
+			enemyUI.DisplayHealthbar(true);
+
 			if (immuneToDamage)
 				return;
 			else 
@@ -125,14 +132,26 @@ namespace RPG.Characters
 				return;
 
 			// First priority: cast spells
-			if (hasSpellAttack && distanceToPlayer <= spellCastRadius 
-					&& currentTime >= spellLockedTill && currentTime >= lockedTill)
+			if (hasSpellAttack)
 			{
-				aICharacterControl.SetTarget(transform);
-				CastSpell();
-				spellLockedTill = currentTime + spellCD;
-				lockedTill = currentTime + spellCastTime;
+				Vector3 dir = (player.transform.position - transform.position).normalized;
+				float dot = Vector3.Dot(dir, transform.forward);
+
+				if (dot > .95f)
+					isFacing = true;
+				else
+					isFacing = false;
 			}
+			
+			if (hasSpellAttack && isFacing && distanceToPlayer <= spellCastRadius && 
+					currentTime >= spellLockedTill && currentTime >= lockedTill)
+				{
+					aICharacterControl.SetTarget(transform);
+					CastSpell();
+					spellLockedTill = currentTime + spellCD;
+					lockedTill = currentTime + spellCastTime;
+				}
+			
 			// second priority: melee attack
 			else if (hasMeleeAttack && distanceToPlayer <= meleeAttackRadius 
 						&& currentTime >= lockedTill)
@@ -155,6 +174,9 @@ namespace RPG.Characters
 			{
 				aICharacterControl.SetTarget(player.transform);
 			}
+
+			if (distanceToPlayer > aggroRange)
+				enemyUI.DisplayHealthbar(false);
 		}
 
 		// will customize further in future
@@ -175,22 +197,33 @@ namespace RPG.Characters
 		void PerformMeleeAttack()
 		{
 			anim.CrossFade("Primary Attack", 0.2f);
-			//player.GetComponent<IDamageable>().TakeDamage(meleeAttackDamage);
 		}
 
-		// will customize further in future
 		void CastSpell()
+		{
+			StartCoroutine(StartSpellCastSequence());
+		}
+
+		void LaunchSpellProjectile(Vector3 hitPoint)
 		{
 			GameObject newProjectile = Instantiate(spellCastProjectile, projectileSocket.transform.position, Quaternion.identity);
 			var projectileComponent = newProjectile.GetComponent<Projectile>();
 			projectileComponent.DamageCaused(spellDamage);
 			projectileComponent.SetShooter(gameObject);
 
-			Vector3 hitPoint = player.GetComponentInChildren<HitPoint>().GetHitPoint();
 			Vector3 unitVectorToPlayer = (hitPoint - projectileSocket.transform.position).normalized;
 
 			float projectileSpeed = projectileComponent.ProjectileSpeed();
 			newProjectile.GetComponent<Rigidbody>().velocity = unitVectorToPlayer * projectileSpeed;
+		}
+
+		IEnumerator StartSpellCastSequence()
+		{
+			anim.CrossFade("Spell Cast", 0.2f);
+			Vector3 hitPoint = player.GetComponentInChildren<HitPoint>().GetHitPoint();
+
+			yield return new WaitForSeconds(spellCastTime);
+			LaunchSpellProjectile(hitPoint);
 		}
 
 		void OnDrawGizmos()
