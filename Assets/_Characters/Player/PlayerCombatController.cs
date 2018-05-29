@@ -11,6 +11,8 @@ namespace RPG.Characters
  		[SerializeField] float attackDamage = 15f;
 
 		// temp for development
+		// 0 is for "weapon art" TODO: Rename to weapon art
+		// 1, 2 is for Heal and spell attack
 		[SerializeField] SpecialAbility[] abilities;
 
 		private const string ACTION_LOCKED = "actionLocked";
@@ -35,8 +37,7 @@ namespace RPG.Characters
 			energy = GetComponent<Energy>();
 
 			SetWeaponData();
-
-			abilities[0].AttachComponentTo(player.gameObject);
+			AttachInitialWeaponAbilities();
 		}
 
 		void Update()
@@ -47,6 +48,10 @@ namespace RPG.Characters
 				StandardMeleeAttack();
 			if (Input.GetMouseButtonDown(1))
 				AttemptSpecialAbility(0);
+			if (Input.GetKeyDown("q"))
+				AttemptSpecialAbility(1);
+			if (Input.GetKeyDown("e"))
+				AttemptSpecialAbility(2);
 		}
 		
 		void SetWeaponData()
@@ -54,6 +59,14 @@ namespace RPG.Characters
  			playerEquippedWeapon = player.GetWeaponInUse();
 			attackDamage = playerEquippedWeapon.GetWeaponDamage();
 			playerBaseDamage = attackDamage;
+		}
+
+		void AttachInitialWeaponAbilities()
+		{
+			for (int abilityIndex = 0; abilityIndex < abilities.Length; abilityIndex++)
+			{
+				abilities[abilityIndex].AttachComponentTo(player.gameObject);
+			}
 		}
 
 		void SendDamageToTarget(float damage)

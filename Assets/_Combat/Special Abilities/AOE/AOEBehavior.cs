@@ -10,13 +10,6 @@ namespace RPG.Combat
 		private const int PLAYER_LAYER = 11;
 
 		AOEConfig config;
-		PlayerCombatController combatController;
-
-		void Start()
-		{
-			combatController = GetComponent<PlayerCombatController>();
-			print("AOE attached");
-		}
 
 		public void SetConfig(AOEConfig configToSet)
 		{
@@ -24,6 +17,12 @@ namespace RPG.Combat
 		}
 
 		public void Use(AbilityParamaters useParams)
+		{
+			DealRadialDamage(useParams);
+			PlayerParticalEffect();
+		}
+
+		private void DealRadialDamage(AbilityParamaters useParams)
 		{
 			RaycastHit[] hits = Physics.SphereCastAll(
 				transform.position,
@@ -44,6 +43,14 @@ namespace RPG.Combat
 					}
 				}
 			}
+		}
+
+		private void PlayerParticalEffect()
+		{
+			var prefab = Instantiate(config.GetParticalPrefab(), this.gameObject.transform);
+			var particals = prefab.GetComponent<ParticleSystem>();
+			particals.Play();
+			Destroy(prefab, particals.main.duration);
 		}
 	}
 }

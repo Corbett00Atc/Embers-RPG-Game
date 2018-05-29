@@ -23,6 +23,7 @@ namespace RPG.Combat
 	{
 		[Header("Special Ability General")]
 		[SerializeField] float energyCost = 10;
+		[SerializeField] GameObject particalPrefab = null;
 
 		protected ISpecialAbility behavior;
 
@@ -36,6 +37,11 @@ namespace RPG.Combat
 		public float GetEneryCost()
 		{
 			return energyCost;
+		}
+
+		public GameObject GetParticalPrefab()
+		{
+			return particalPrefab;
 		}
 	}
 }

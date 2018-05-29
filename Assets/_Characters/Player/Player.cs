@@ -17,14 +17,23 @@ namespace RPG.Characters
 		[SerializeField] AnimatorOverrideController animatorOverrideController;
 		[SerializeField] GameObject hitEffect;
 		[SerializeField] float deathResetTime = 2;
-
-		float currentHealthPoints;
+		[SerializeField] AudioClip[] damageSounds;
+		[SerializeField] AudioClip[] deathSounds;
+				
 		HitPoint hitPoint;
 		WeaponHook weaponDamageCollider;
 		Animator anim;
+		AudioSource audioSource;
+
+		float currentHealthPoints;
 
 		public float healthAsPercentage 
-		{ get { return currentHealthPoints / maxHealthPoints; }	}
+		{ 
+			get 
+			{ 
+				return (currentHealthPoints > 0) ? currentHealthPoints / maxHealthPoints : 0; 
+			}	
+		}
 		
 		void Start()
 		{
@@ -34,15 +43,27 @@ namespace RPG.Characters
 			hitPoint = GetComponentInChildren<HitPoint>();
 			weaponDamageCollider = GetComponentInChildren<WeaponHook>();
 			anim = GetComponent<Animator>();
+			audioSource = GetComponent<AudioSource>();
 		} 
 		
 		public void TakeDamage(float damage)
 		{
 			ReduceHealth(damage);
 
-			bool playerDies = (currentHealthPoints - damage <= 0);
+			// player is being healed
+			if (damage < 0)
+				return;
+
+			anim.CrossFade("Hit", .02f);
+
+			bool playerDies = (currentHealthPoints <= 0);
 			if (playerDies)
 				StartCoroutine(KillPlayer());
+			else
+			{
+				audioSource.clip = damageSounds[UnityEngine.Random.Range(0, damageSounds.Length)];
+				audioSource.Play();
+			}
 		}
 
 		private void ReduceHealth(float damage)
@@ -93,7 +114,12 @@ namespace RPG.Characters
 
 		IEnumerator KillPlayer()
 		{
-			anim.SetTrigger("PlayerDied");
+			anim.SetBool("isDead", true);
+			anim.CrossFade("Die", 0.2f);
+
+			audioSource.clip = deathSounds[UnityEngine.Random.Range(0, deathSounds.Length)];
+			audioSource.Play();
+
 			yield return new WaitForSeconds(deathResetTime);
 			SceneManager.LoadScene(0);
 		}

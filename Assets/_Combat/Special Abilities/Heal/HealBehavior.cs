@@ -4,25 +4,25 @@ using UnityEngine;
 using RPG.Characters;
 
 namespace RPG.Combat
-{
-	public class PowerAttackBehavior : MonoBehaviour, ISpecialAbility
+{	
+	public class HealBehavior : MonoBehaviour, ISpecialAbility
 	{
-		PowerAttackConfig config;
-		PlayerCombatController combatController;
+		Player player;
+		HealConfig config;
 
 		void Start()
 		{
-			combatController = GetComponent<PlayerCombatController>();
+			player = GetComponent<Player>();
 		}
 
-		public void SetConfig(PowerAttackConfig configToSet)
+		public void SetConfig(HealConfig configToSet)
 		{
 			this.config = configToSet;
 		}
 
 		public void Use(AbilityParamaters useParams)
 		{
-			combatController.SetWeaponDamage(useParams.baseDamage + config.GetExtraDamage());
+			player.TakeDamage(config.HealAmount() * -1);
 			PlayerParticalEffect();
 		}
 

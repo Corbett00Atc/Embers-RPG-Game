@@ -49,7 +49,7 @@ namespace RPG.Characters
 		public bool immuneToDamage = true;
 
 		AICharacterControl aICharacterControl = null;
-		GameObject player = null;
+		Player player = null;
 
 		TargetMarker targetMark;
 		Renderer rend;
@@ -59,7 +59,7 @@ namespace RPG.Characters
 
 		void Start()
 		{
-			player = GameObject.FindGameObjectWithTag("Player");
+			player = FindObjectOfType<Player>();
 			aICharacterControl = GetComponent<AICharacterControl>();
 			targetMark = GetComponentInChildren<TargetMarker>();
 			rend = targetMark.GetComponentInChildren<Renderer>();
@@ -118,6 +118,7 @@ namespace RPG.Characters
 			}
 
 			currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints);
+			anim.CrossFade("Hit", .02f);
 
 			if (currentHealthPoints == 0)
 			{
@@ -128,6 +129,9 @@ namespace RPG.Characters
 		// basic ai decision making based on range
 		void MakeMoveAttackDecision()
 		{
+			if (player.healthAsPercentage <= Mathf.Epsilon)
+				return;
+
 			if (anim.GetBool("actionLocked") == true)
 				return;
 
@@ -220,9 +224,9 @@ namespace RPG.Characters
 		IEnumerator StartSpellCastSequence()
 		{
 			anim.CrossFade("Spell Cast", 0.2f);
-			Vector3 hitPoint = player.GetComponentInChildren<HitPoint>().GetHitPoint();
-
 			yield return new WaitForSeconds(spellCastTime);
+			
+			Vector3 hitPoint = player.GetComponentInChildren<HitPoint>().GetHitPoint();
 			LaunchSpellProjectile(hitPoint);
 		}
 
