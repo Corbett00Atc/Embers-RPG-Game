@@ -9,10 +9,14 @@ namespace RPG.Combat
 	{
 		Player player;
 		HealConfig config;
+		AudioClip audioClip;
+		AudioSource audioSource;
 
 		void Start()
 		{
 			player = GetComponent<Player>();
+			audioClip = config.GetAudioClip();
+			audioSource = GetComponent<AudioSource>();
 		}
 
 		public void SetConfig(HealConfig configToSet)
@@ -22,8 +26,15 @@ namespace RPG.Combat
 
 		public void Use(AbilityParamaters useParams)
 		{
-			player.TakeDamage(config.HealAmount() * -1);
+			player.ReceiveHealth(config.HealAmount());
 			PlayerParticalEffect();
+			PlayAudio();
+		}
+
+		private void PlayAudio()
+		{
+			audioSource.clip = audioClip;
+			audioSource.Play();
 		}
 
 		private void PlayerParticalEffect()

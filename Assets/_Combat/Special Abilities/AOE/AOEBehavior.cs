@@ -10,16 +10,21 @@ namespace RPG.Combat
 		private const int PLAYER_LAYER = 11;
 
 		AOEConfig config;
+		AudioClip audioClip;
+		AudioSource audioSource;
 
 		public void SetConfig(AOEConfig configToSet)
 		{
 			this.config = configToSet;
+			audioClip = config.GetAudioClip();
+			audioSource = GetComponent<AudioSource>();
 		}
 
 		public void Use(AbilityParamaters useParams)
 		{
 			DealRadialDamage(useParams);
 			PlayerParticalEffect();
+			PlayAudio();
 		}
 
 		private void DealRadialDamage(AbilityParamaters useParams)
@@ -51,6 +56,12 @@ namespace RPG.Combat
 			var particals = prefab.GetComponent<ParticleSystem>();
 			particals.Play();
 			Destroy(prefab, particals.main.duration);
+		}
+
+		private void PlayAudio()
+		{
+			audioSource.clip = audioClip;
+			audioSource.Play();
 		}
 	}
 }

@@ -48,12 +48,9 @@ namespace RPG.Characters
 		
 		public void TakeDamage(float damage)
 		{
-			ReduceHealth(damage);
+			currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints); 
 
-			// player is being healed
-			if (damage < 0)
-				return;
-
+			CreateHitEffect();
 			anim.CrossFade("Hit", .02f);
 
 			bool playerDies = (currentHealthPoints <= 0);
@@ -66,10 +63,9 @@ namespace RPG.Characters
 			}
 		}
 
-		private void ReduceHealth(float damage)
+		public void ReceiveHealth(float health)
 		{
-			CreateHitEffect();
-			currentHealthPoints = Mathf.Clamp(currentHealthPoints - damage, 0, maxHealthPoints); 
+			currentHealthPoints = Mathf.Clamp(currentHealthPoints + health, 0, maxHealthPoints); 
 		}
 
 		public Weapon GetWeaponInUse()
@@ -87,7 +83,12 @@ namespace RPG.Characters
 		{
 			var animator = GetComponent<Animator>();
 			animator.runtimeAnimatorController = animatorOverrideController;
+
 			animatorOverrideController["Default Attack"] = weaponInUse.GetAttackAnimClip();
+
+			var abilities = GetComponent<PlayerCombatController>().GetAbilities();
+			animatorOverrideController["Spell"] = abilities[1].GetAnimation();
+			animatorOverrideController["Heal"] = abilities[2].GetAnimation();
 		}
 
 		void PutWeaponInHand()

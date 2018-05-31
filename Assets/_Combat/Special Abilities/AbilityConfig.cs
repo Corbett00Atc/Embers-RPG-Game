@@ -19,29 +19,26 @@ namespace RPG.Combat
 		}
 	}
 	
-	public abstract class SpecialAbility : ScriptableObject 
+	public abstract class AbilityConfig : ScriptableObject 
 	{
 		[Header("Special Ability General")]
 		[SerializeField] float energyCost = 10;
 		[SerializeField] GameObject particalPrefab = null;
+		[SerializeField] AudioClip audioClip = null;
+		[SerializeField] AnimationClip anim = null;
 
 		protected ISpecialAbility behavior;
 
+		public float GetEneryCost() { return energyCost; }
+		public GameObject GetParticalPrefab(){ return particalPrefab; }
+		public AudioClip GetAudioClip() { return audioClip; }
+		public AnimationClip GetAnimation() { return anim; }
+
 		abstract public void AttachComponentTo(GameObject gameObjectToAttachTo);
 
-		public void Use(AbilityParamaters useParams)
-		{
-			behavior.Use(useParams);
-		}
-
-		public float GetEneryCost()
-		{
-			return energyCost;
-		}
-
-		public GameObject GetParticalPrefab()
-		{
-			return particalPrefab;
+		public void Use(AbilityParamaters useParams) 
+		{ 
+			behavior.Use(useParams); 
 		}
 	}
 }

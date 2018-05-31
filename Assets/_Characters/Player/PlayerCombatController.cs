@@ -13,11 +13,13 @@ namespace RPG.Characters
 		// temp for development
 		// 0 is for "weapon art" TODO: Rename to weapon art
 		// 1, 2 is for Heal and spell attack
-		[SerializeField] SpecialAbility[] abilities;
+		[SerializeField] AbilityConfig[] abilities;
 
 		private const string ACTION_LOCKED = "actionLocked";
 		private const string PRIMARY_ATTACK = "Primary Attack";
 		private const string ALT_ATTACK = "Alt Attack";
+		private const string SPECIAL_ABILITY_HEAL = "Heal";
+		private const string SPECIAL_ABILITY_SPELL = "Spell";
 		private const string MOVEMENT_ROLL = "Roll";
 		private const int PLAYER_LAYER = 11;
 		private const int IGNORE_ATTACK_LAYER = 17;
@@ -47,11 +49,11 @@ namespace RPG.Characters
 			if (Input.GetMouseButtonDown(0))
 				StandardMeleeAttack();
 			if (Input.GetMouseButtonDown(1))
-				AttemptSpecialAbility(0);
+				AttemptSecondaryAbility();
 			if (Input.GetKeyDown("q"))
-				AttemptSpecialAbility(1);
+				AttemptSpecialAbility(1, SPECIAL_ABILITY_SPELL);
 			if (Input.GetKeyDown("e"))
-				AttemptSpecialAbility(2);
+				AttemptSpecialAbility(2, SPECIAL_ABILITY_HEAL);
 		}
 		
 		void SetWeaponData()
@@ -85,7 +87,19 @@ namespace RPG.Characters
 			}
 		}
 
-		void AttemptSpecialAbility(int abilityIndex)
+		void AttemptSecondaryAbility()
+		{
+			float energyCost = abilities[0].GetEneryCost();
+			if (CanUseAbility(energyCost))
+			{
+				energy.ConsumeEnergy(energyCost);
+				var abilityParams = new AbilityParamaters(playerBaseDamage);
+				abilities[0].Use(abilityParams);
+				anim.CrossFade(ALT_ATTACK, 0.2f);
+			}
+		}
+
+		void AttemptSpecialAbility(int abilityIndex, string type)
 		{
 			float energyCost = abilities[abilityIndex].GetEneryCost();
 			if (CanUseAbility(energyCost))
@@ -93,8 +107,13 @@ namespace RPG.Characters
 				energy.ConsumeEnergy(energyCost);
 				var abilityParams = new AbilityParamaters(playerBaseDamage);
 				abilities[abilityIndex].Use(abilityParams);
-				anim.CrossFade(ALT_ATTACK, 0.2f);
+				anim.CrossFade(type, 0.2f);
 			}
+		}
+
+		public AbilityConfig[] GetAbilities()
+		{
+			return abilities;
 		}
 
 		private bool CanUseAbility(float energyCost)

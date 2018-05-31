@@ -6,7 +6,7 @@ using RPG.Characters;
 namespace RPG.Combat
 {	
 	[CreateAssetMenu(menuName=("RPG/Special Ability/Heal"))]
-	public class HealConfig : SpecialAbility 
+	public class HealConfig : AbilityConfig 
 	{
 		[Header("Heal Specific")]
 		[SerializeField] float healAmount = 50f;

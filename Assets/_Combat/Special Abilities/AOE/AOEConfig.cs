@@ -6,7 +6,7 @@ using RPG.Characters;
 namespace RPG.Combat
 {	
 	[CreateAssetMenu(menuName=("RPG/Special Ability/AOE"))]
-	public class AOEConfig : SpecialAbility 
+	public class AOEConfig : AbilityConfig 
 	{
 		[Header("AOE Specific")]
 		[SerializeField] float perTargetDamage = 20f;

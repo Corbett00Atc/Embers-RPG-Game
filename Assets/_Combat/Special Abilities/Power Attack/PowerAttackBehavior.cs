@@ -9,10 +9,14 @@ namespace RPG.Combat
 	{
 		PowerAttackConfig config;
 		PlayerCombatController combatController;
+		AudioClip audioClip;
+		AudioSource audioSource;
 
 		void Start()
 		{
 			combatController = GetComponent<PlayerCombatController>();
+			audioClip = config.GetAudioClip();
+			audioSource = GetComponent<AudioSource>();
 		}
 
 		public void SetConfig(PowerAttackConfig configToSet)
@@ -24,6 +28,7 @@ namespace RPG.Combat
 		{
 			combatController.SetWeaponDamage(useParams.baseDamage + config.GetExtraDamage());
 			PlayerParticalEffect();
+			PlayAudio();
 		}
 
 		private void PlayerParticalEffect()
@@ -32,6 +37,12 @@ namespace RPG.Combat
 			var particals = prefab.GetComponent<ParticleSystem>();
 			particals.Play();
 			Destroy(prefab, particals.main.duration);
+		}
+
+		private void PlayAudio()
+		{
+			audioSource.clip = audioClip;
+			audioSource.Play();
 		}
 	}
 }
